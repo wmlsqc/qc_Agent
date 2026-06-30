@@ -83,12 +83,17 @@ dmypy.json
 # Streamlit
 .streamlit/secrets.toml
 
+# Local lightweight memory
+memory/user_memory.json
+
 # Temporary files
 *.tmp
 *.bak
 *.swp
 *~.nib
 local.properties
+scripts/.tmp_project_checks/
+scripts/build_agent_report_docx.py
 
 # Distribution / packaging
 *.egg-info/

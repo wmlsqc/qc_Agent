@@ -1,0 +1,70 @@
+[
+  {
+    "id": "model_info",
+    "name": "开发调试：模型信息查询",
+    "type": "tool",
+    "call": "get_model_info",
+    "args": {},
+    "expected_keywords": ["聊天模型", "Embedding模型", "qwen3-max", "text-embedding-v4"]
+  },
+  {
+    "id": "agent_diagnostics",
+    "name": "开发调试：Agent 自检",
+    "type": "tool",
+    "call": "get_agent_diagnostics",
+    "args": {},
+    "expected_keywords": ["Agent自检结果", "总体状态", "已注册工具列表", "DASHSCOPE_API_KEY"]
+  },
+  {
+    "id": "robot_status",
+    "name": "设备状态查询",
+    "type": "tool",
+    "call": "get_robot_status",
+    "args": {"user_id": "1004"},
+    "expected_keywords": ["用户1004", "设备", "电量", "在线状态", "异常"]
+  },
+  {
+    "id": "consumable_status",
+    "name": "耗材状态查询",
+    "type": "tool",
+    "call": "get_consumable_status",
+    "args": {"user_id": "1004"},
+    "expected_keywords": ["用户1004", "主刷", "边刷", "滤网", "保养"]
+  },
+  {
+    "id": "cleaning_history",
+    "name": "清扫历史查询",
+    "type": "tool",
+    "call": "get_cleaning_history",
+    "args": {"user_id": "1001"},
+    "expected_keywords": ["用户1001", "清扫", "覆盖率", "使用建议"]
+  },
+  {
+    "id": "fault_diagnosis",
+    "name": "故障诊断",
+    "type": "tool",
+    "call": "diagnose_fault",
+    "args": {"issue": "机器人无法回充", "user_id": "1004"},
+    "mock_rag": "知识库参考：无法回充时应检查基站位置、回充传感器和障碍物。\n\n参考来源：\n- data/故障排除.txt",
+    "expected_keywords": ["可能原因", "排查步骤", "风险等级", "是否建议售后", "下一步建议"]
+  },
+  {
+    "id": "comprehensive_analysis_data_chain",
+    "name": "综合分析数据链",
+    "type": "composite",
+    "calls": [
+      {"call": "get_user_profile", "args": {"user_id": "1004"}},
+      {"call": "get_robot_status", "args": {"user_id": "1004"}},
+      {"call": "get_consumable_status", "args": {"user_id": "1004"}},
+      {"call": "get_cleaning_history", "args": {"user_id": "1004"}}
+    ],
+    "expected_keywords": ["用户1004", "设备", "耗材", "清扫"]
+  },
+  {
+    "id": "rag_no_result",
+    "name": "RAG 无资料兜底",
+    "type": "rag",
+    "query": "苹果手机如何截图",
+    "expected_keywords": ["知识库中未检索到足够资料"]
+  }
+]

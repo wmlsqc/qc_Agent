@@ -1,0 +1,31 @@
+services:
+  agent-project:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agent-project:local
+    container_name: agent-project
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app
+      STREAMLIT_SERVER_HEADLESS: "true"
+      PIP_NO_CACHE_DIR: "1"
+    ports:
+      - "8502:8501"
+    working_dir: /app
+    command: >
+      streamlit run app.py
+      --server.address=0.0.0.0
+      --server.port=8501
+      --server.headless=true
+      --server.enableCORS=false
+      --server.enableXsrfProtection=false
+      --browser.gatherUsageStats=false
+    volumes:
+      - ./:/app
+      - ./data:/app/data
+      - ./rag/chroma_db:/app/rag/chroma_db
+      - ./logs:/app/logs
+      - ./md5.txt:/app/md5.txt
+    restart: unless-stopped

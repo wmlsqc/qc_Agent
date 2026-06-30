@@ -1,3 +1,4 @@
+import time
 from typing import Callable
 from langgraph.runtime import Runtime
 from langchain.agents import AgentState
@@ -15,18 +16,22 @@ def monitor_tool(
         request: ToolCallRequest,    # 请求的数据封装
         handler: Callable[[ToolCallRequest],ToolMessage | Command]  # 执行的函数本身
 ) -> ToolMessage | Command:
-    logger.info(f'[monitor_tool]执行工具: {request.tool_call["name"]}')
-    logger.info(f'[monitor_tool]参入参数: {request.tool_call["args"]}')
+    tool_name = request.tool_call["name"]
+    tool_args = request.tool_call["args"]
+    start_time = time.perf_counter()
+    logger.info(f'[monitor_tool]开始执行工具: {tool_name} | 参数: {tool_args}')
     try:
         result =  handler(request)
-        logger.info(f'[monitor_tool]工具{request.tool_call["name"]}调用成功')
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+        logger.info(f'[monitor_tool]工具调用成功: {tool_name} | 耗时: {elapsed_ms:.2f}ms | 参数: {tool_args}')
 
-        if request.tool_call['name'] == 'fill_context_for_report':
+        if tool_name == 'fill_context_for_report':
             request.runtime.context['report'] = True
 
         return result
     except Exception as e:
-        logger.error(f'工具{request.tool_call["name"]}调用失败,原因: {str(e)}')
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+        logger.error(f'[monitor_tool]工具调用失败: {tool_name} | 耗时: {elapsed_ms:.2f}ms | 参数: {tool_args} | 原因: {str(e)}')
         raise e
 
 # 在模型执行前输出日志
@@ -35,8 +40,8 @@ def log_before_model(
         state: AgentState,  # 整个Agent智能体中的状态记录
         runtime: Runtime,   # 记录了整个执行过程中的上下文信息
 ):
-    logger.info(f'[log_before_model]即将调用模型, 带有{len(state['messages'])}条消息.')
-    logger.debug(f'[log_before_model]{type(state['messages'][-1]).__name__} | {state['messages'][-1].content.strip()}')
+    logger.info(f"[log_before_model]即将调用模型, 带有{len(state['messages'])}条消息.")
+    logger.debug(f"[log_before_model]{type(state['messages'][-1]).__name__} | {state['messages'][-1].content.strip()}")
 
     return None
 
